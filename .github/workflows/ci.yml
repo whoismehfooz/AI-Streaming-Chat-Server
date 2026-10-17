@@ -105,9 +105,17 @@ jobs:
         run: pip install -r requirements.txt
         working-directory: ./backend
 
+      - name: Create test database
+        run: |
+          PGPASSWORD=ci_password psql \
+            -h localhost \
+            -U ci_user \
+            -d streaming_db \
+            -c "CREATE DATABASE streaming_db_test;"
+
       - name: Run Alembic migrations
         env:
-          ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
+          ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
         working-directory: ./backend
         run: alembic upgrade head
 

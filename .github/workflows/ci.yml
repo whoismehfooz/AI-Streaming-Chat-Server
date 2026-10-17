@@ -6,10 +6,6 @@ on:
       - main
       - feature/backend-core
 
-  pull_request:
-    branches:
-      - main
-
 jobs:
   test:
     name: Unit and API Tests
@@ -33,7 +29,7 @@ jobs:
     env:
       GROQ_API_KEY: XXYYZZ
       GROQ_MODEL: openai/gpt-oss-20b
-      DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
+      DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
       TEST_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
 
     steps:
@@ -57,11 +53,13 @@ jobs:
             -d streaming_db \
             -c "CREATE DATABASE streaming_db_test;"
 
-      - name: Run Alembic migrations
+      - name: Run Alembic migrations on main and test DBs
         env:
           ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
         working-directory: ./backend
-        run: alembic upgrade head
+        run: |
+          alembic upgrade head
+          ALEMBIC_DATABASE_URL=postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db alembic upgrade head
 
       - name: Run Tests
         working-directory: ./backend
@@ -89,7 +87,7 @@ jobs:
     env:
       GROQ_API_KEY: XXYYZZ
       GROQ_MODEL: openai/gpt-oss-20b
-      DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
+      DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
       TEST_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
 
     steps:
@@ -119,6 +117,6 @@ jobs:
         working-directory: ./backend
         run: alembic upgrade head
 
-      - name: Run database integration Tests
+      - name: Run database integration tests
         working-directory: ./backend
         run: python -m pytest -q tests/integration/test_chat_flow.py

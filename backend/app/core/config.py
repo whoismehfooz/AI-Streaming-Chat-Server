@@ -6,7 +6,7 @@ BACKEND_DIR=Path(__file__).resolve().parents[2]
 
 class Settings(BaseSettings):
     APP_NAME: str="AI Streaming Chat Server"
-    APP_ENV: str="developement"
+    APP_ENV: str="development"
     DEBUG: bool=False
 
     CHAT_MAX_OUTPUT_TOKENS: int=512

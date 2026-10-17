@@ -59,7 +59,7 @@ jobs:
       - name: Run Alembic migrations
         env:
           ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
-        run: alembic upgrade head
+        run: alembic -c alembic.ini upgrade head
 
       - name: Run Tests
         run: python -m pytest -m "not integration"
@@ -104,7 +104,7 @@ jobs:
       - name: Run Alembic migrations
         env:
           ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
-        run: alembic upgrade head
+        run: alembic -c alembic.ini upgrade head
 
       - name: Run database integration Tests
         run: python -m pytest -q tests/integration/test_chat_flow.py

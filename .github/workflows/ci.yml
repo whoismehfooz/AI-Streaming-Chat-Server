@@ -33,8 +33,8 @@ jobs:
     env:
       GROQ_API_KEY: XXYYZZ
       GROQ_MODEL: openai/gpt-oss-20b
-      DATABASE_URL: postgres+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
-      TEST_DATABASE_URL: postgres+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
+      DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
+      TEST_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
 
     steps:
       - name: Checkout repository
@@ -89,8 +89,8 @@ jobs:
     env:
       GROQ_API_KEY: XXYYZZ
       GROQ_MODEL: openai/gpt-oss-20b
-      DATABASE_URL: postgres+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
-      TEST_DATABASE_URL: postgres+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
+      DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
+      TEST_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
 
     steps:
       - name: Checkout repository

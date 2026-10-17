@@ -47,6 +47,7 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+        working-directory: ./backend
 
       - name: Create test database
         run: |
@@ -59,9 +60,11 @@ jobs:
       - name: Run Alembic migrations
         env:
           ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db_test
-        run: alembic -c alembic.ini upgrade head
+        working-directory: ./backend
+        run: alembic upgrade head
 
       - name: Run Tests
+        working-directory: ./backend
         run: python -m pytest -m "not integration"
 
   integration:
@@ -100,11 +103,14 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+        working-directory: ./backend
 
       - name: Run Alembic migrations
         env:
           ALEMBIC_DATABASE_URL: postgresql+asyncpg://ci_user:ci_password@localhost:5432/streaming_db
-        run: alembic -c alembic.ini upgrade head
+        working-directory: ./backend
+        run: alembic upgrade head
 
       - name: Run database integration Tests
+        working-directory: ./backend
         run: python -m pytest -q tests/integration/test_chat_flow.py

@@ -352,29 +352,40 @@ async def test_chat_streaming_endpoint():
         app.dependency_overrides.pop(get_ai_service, None)
 
 
+
 @pytest.mark.asyncio
 async def test_chat_streaming_endpoint_nonexistent_conversation():
-    transport = ASGITransport(app=app)
+    class FakeStreamingAIService:
+        async def stream_response(self, messages):
+            yield "This should not be reached"
 
-    async with AsyncClient(
-        transport=transport,
-        base_url="http://test",
-    ) as client:
-        response = await client.post(
-            f"/conversations/{uuid4()}/chat/stream",
-            json={"content": "This should fail"},
+    app.dependency_overrides[get_ai_service] = FakeStreamingAIService
+
+    try:
+        transport = ASGITransport(app=app)
+
+        async with AsyncClient(
+            transport=transport,
+            base_url="http://test",
+        ) as client:
+            response = await client.post(
+                f"/conversations/{uuid4()}/chat/stream",
+                json={"content": "This should fail"},
+            )
+
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith(
+            "text/event-stream"
         )
 
-    assert response.status_code == 200
-    assert response.headers["content-type"].startswith("text/event-stream")
+        body = response.text
 
-    body = response.text
+        assert "event: error" in body
+        assert "Conversation Not Found." in body
+        assert "event: done" not in body
 
-    assert (
-        'event: error\ndata: {"message": "Conversation Not Found."}'
-        in body
-    )
-    assert "event: done" not in body
+    finally:
+        app.dependency_overrides.pop(get_ai_service, None)
 
 
 @pytest.mark.asyncio

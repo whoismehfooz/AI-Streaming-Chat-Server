@@ -1,3 +1,6 @@
+import os
+
+os.environ.setdefault("GROQ_API_KEY", "ci-test-key-not-used")
 
 import httpx
 import pytest

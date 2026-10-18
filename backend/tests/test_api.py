@@ -309,32 +309,44 @@ async def test_create_message_for_nonexistent_conversation():
 
 @pytest.mark.asyncio
 async def test_chat_streaming_endpoint():
+    class FakeStreamingAIService:
+        async def stream_response(self, messages):
+            yield "Stream "
+            yield "token!"
 
     app.dependency_overrides[get_ai_service] = FakeStreamingAIService
 
     try:
-
         transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as client:
+
+        async with AsyncClient(
+            transport=transport,
+            base_url="http://test",
+        ) as client:
             conversation_response = await client.post(
                 "/conversations",
-                json={"title": "API Stream Test"}
+                json={"title": "API Stream Test"},
             )
+
             assert conversation_response.status_code == 201
             conversation_id = conversation_response.json()["id"]
 
             response = await client.post(
                 f"/conversations/{conversation_id}/chat/stream",
-                json={"content": "Hello stream"}
+                json={"content": "Hello stream"},
             )
 
             assert response.status_code == 200
-            assert response.headers["content-type"].startswith("text/event-stream")
+            assert response.headers["content-type"].startswith(
+                "text/event-stream"
+            )
 
             body = response.text
-            assert "data: Stream " in body
-            assert "data: token!" in body
-            assert "data: [DONE]" in body
+
+            assert 'event: token\ndata: {"text": "Stream "}' in body
+            assert 'event: token\ndata: {"text": "token!"}' in body
+            assert 'event: done\ndata: {"text": "[DONE]"}' in body
+            assert "event: error" not in body
 
     finally:
         app.dependency_overrides.pop(get_ai_service, None)
@@ -343,15 +355,26 @@ async def test_chat_streaming_endpoint():
 @pytest.mark.asyncio
 async def test_chat_streaming_endpoint_nonexistent_conversation():
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test",
+    ) as client:
         response = await client.post(
             f"/conversations/{uuid4()}/chat/stream",
-            json={"content": "This should fail"}
+            json={"content": "This should fail"},
         )
 
-        assert response.status_code == 200
-        body = response.text
-        assert "data: [ERROR: Conversation Not Found.]" in body
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+
+    body = response.text
+
+    assert (
+        'event: error\ndata: {"message": "Conversation Not Found."}'
+        in body
+    )
+    assert "event: done" not in body
 
 
 @pytest.mark.asyncio
@@ -373,28 +396,29 @@ async def test_chat_stream_endpoint_with_persisted_message():
 
         async with AsyncClient(
             transport=transport,
-            base_url="http://test"
+            base_url="http://test",
         ) as client:
             conversation_response = await client.post(
                 "/conversations",
-                json={
-                    "title": "Persistence Streaming Test"
-                }
+                json={"title": "Persistence Streaming Test"},
             )
 
+            assert conversation_response.status_code == 201
             conversation_id = conversation_response.json()["id"]
 
             response = await client.post(
                 f"/conversations/{conversation_id}/chat/stream",
-                json={
-                    "content": "First user message"
-                }
+                json={"content": "First user message"},
             )
 
             assert response.status_code == 200
-            assert "data: Fake" in response.text
-            assert "data: response 1" in response.text
-            assert "data: [DONE]" in response.text
+
+            body = response.text
+
+            assert 'event: token\ndata: {"text": "Fake "}' in body
+            assert 'event: token\ndata: {"text": "response 1"}' in body
+            assert 'event: done\ndata: {"text": "[DONE]"}' in body
+            assert "event: error" not in body
 
             history_response = await client.get(
                 f"/conversations/{conversation_id}/messages"
@@ -434,68 +458,66 @@ async def test_chat_stream_endpoint_preserves_multi_turn_context():
 
         async with AsyncClient(
             transport=transport,
-            base_url="http://test"
+            base_url="http://test",
         ) as client:
-
             conversation_response = await client.post(
                 "/conversations",
-                json={
-                    "title": "Multi-turn Streaming test"
-                }
+                json={"title": "Multi-turn Streaming test"},
             )
 
             assert conversation_response.status_code == 201
-
             conversation_id = conversation_response.json()["id"]
 
             first_message = await client.post(
                 f"/conversations/{conversation_id}/chat/stream",
-                json={
-                    "content": "My name is Ray."
-                }
+                json={"content": "My name is Ray."},
             )
 
             assert first_message.status_code == 200
+            assert 'event: done\ndata: {"text": "[DONE]"}' in (
+                first_message.text
+            )
 
             second_message = await client.post(
                 f"/conversations/{conversation_id}/chat/stream",
-                json={
-                    "content": "What is my name?"
-                }
+                json={"content": "What is my name?"},
             )
 
             assert second_message.status_code == 200
+            assert 'event: done\ndata: {"text": "[DONE]"}' in (
+                second_message.text
+            )
 
             assert len(fake_ai_service.calls) == 2
 
             assert fake_ai_service.calls[0] == [
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant."
+                    "content": "You are a helpful assistant.",
                 },
                 {
                     "role": "user",
-                    "content": "My name is Ray."
-                }
+                    "content": "My name is Ray.",
+                },
             ]
 
             assert fake_ai_service.calls[1] == [
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant."
+                    "content": "You are a helpful assistant.",
                 },
                 {
                     "role": "user",
-                    "content": "My name is Ray."
+                    "content": "My name is Ray.",
                 },
                 {
                     "role": "assistant",
-                    "content": "Fake response 1"
+                    "content": "Fake response 1",
                 },
                 {
                     "role": "user",
-                    "content": "What is my name?"
-                }
+                    "content": "What is my name?",
+                },
             ]
 
     finally:
@@ -510,19 +532,15 @@ async def test_chat_stream_persists_user_message_when_ai_provider_fails(
 
     async with AsyncClient(
         transport=transport,
-        base_url="http://test"
+        base_url="http://test",
     ) as client:
-
-        response = await client.post(
+        conversation_response = await client.post(
             "/conversations",
-            json={
-                "title": "AI Failure Streaming Test"
-            }
+            json={"title": "AI Failure Streaming Test"},
         )
 
-        assert response.status_code == 201
-
-        conversation_id = response.json()["id"]
+        assert conversation_response.status_code == 201
+        conversation_id = conversation_response.json()["id"]
 
         app.dependency_overrides[get_ai_service] = FailingAIService
 
@@ -531,12 +549,19 @@ async def test_chat_stream_persists_user_message_when_ai_provider_fails(
                 f"/conversations/{conversation_id}/chat/stream",
                 json={
                     "content": "This message should survive an AI failure."
-                }
+                },
             )
 
-            # SSE stream error ke case mein 200 return karke data: [ERROR] bhejta hai
             assert response.status_code == 200
-            assert "AI provider request failed." in response.text
+            assert response.headers["content-type"].startswith(
+                "text/event-stream"
+            )
+
+            body = response.text
+
+            assert "event: error" in body
+            assert "AI provider request failed." in body
+            assert "event: done" not in body
 
             async with test_database() as session:
                 result = await session.execute(

@@ -1,17 +1,17 @@
-import pytest 
-import httpx2
+
+import httpx
+import pytest
 
 from openai import (
-    RateLimitError,
-    AuthenticationError,
-    APITimeoutError,
     APIConnectionError,
-    APIStatusError
+    APIStatusError,
+    APITimeoutError,
+    AuthenticationError,
+    RateLimitError,
 )
 
 from app.exceptions.custom_exceptions import AIProviderException
 from app.services import AIService
-
 
 
 @pytest.mark.asyncio
@@ -31,28 +31,32 @@ async def test_stream_response_success():
         yield FakeChunk()
         yield FakeChunk()
 
-    async def mock_stream(*args,**kwargs):
+    async def mock_stream(*args, **kwargs):
         return generate_chunks()
 
     service.client.chat.completions.create = mock_stream
 
-    tokens = []
-    async for token in service.stream_response([]):
-        tokens.append(token)
+    try:
+        tokens = []
 
-    assert tokens == ["test-token","test-token"]
+        async for token in service.stream_response([]):
+            tokens.append(token)
 
+        assert tokens == ["test-token", "test-token"]
+
+    finally:
+        await service.close()
 
 
 @pytest.mark.asyncio
 async def test_stream_response_rate_limit_error():
     service = AIService()
 
-    http_request = httpx2.Request(
+    http_request = httpx.Request(
         "POST",
-        "https://api.groq.com/openai/v1/chat/completions"
+        "https://api.groq.com/openai/v1/chat/completions",
     )
-    http_response = httpx2.Response(
+    http_response = httpx.Response(
         429,
         request=http_request,
     )
@@ -66,51 +70,63 @@ async def test_stream_response_rate_limit_error():
 
     service.client.chat.completions.create = raise_rate_limit
 
-    with pytest.raises(AIProviderException) as exc_info:
-        async for _ in service.stream_response([]):
-            pass
+    try:
+        with pytest.raises(AIProviderException) as exc_info:
+            async for _ in service.stream_response([]):
+                pass
 
-    assert exc_info.value.status_code == 429
-    assert str(exc_info.value) == "AI provider rate limit or quota exceeded."
+        assert exc_info.value.status_code == 429
+        assert str(exc_info.value) == (
+            "AI provider rate limit or quota exceeded."
+        )
+
+    finally:
+        await service.close()
 
 
 @pytest.mark.asyncio
 async def test_stream_response_authentication_error():
     service = AIService()
 
-    http_request = httpx2.Request(
+    http_request = httpx.Request(
         "POST",
-        "https://api.groq.com/openai/v1/chat/completions"
+        "https://api.groq.com/openai/v1/chat/completions",
     )
-    http_response = httpx2.Response(
+    http_response = httpx.Response(
         401,
-        request=http_request
+        request=http_request,
     )
 
     async def raise_auth_error(*args, **kwargs):
         raise AuthenticationError(
             "invalid api key",
             response=http_response,
-            body=None
+            body=None,
         )
 
     service.client.chat.completions.create = raise_auth_error
 
-    with pytest.raises(AIProviderException) as exc_info:
-        async for _ in service.stream_response([]):
-            pass
+    try:
+        with pytest.raises(AIProviderException) as exc_info:
+            async for _ in service.stream_response([]):
+                pass
 
-    assert exc_info.value.status_code == 502
-    assert str(exc_info.value) == "AI provider authentication failed."
+        assert exc_info.value.status_code == 502
+        assert str(exc_info.value) == (
+            "AI provider authentication failed."
+        )
+
+    finally:
+        await service.close()
 
 
 @pytest.mark.asyncio
 async def test_stream_response_timeout_error():
     service = AIService()
 
-    http_request = httpx2.Request(
+    http_request = httpx.Request(
         "POST",
-        "https://api.groq.com/openai/v1/chat/completions"
+        "https://api.groq.com/openai/v1/chat/completions",
     )
 
     async def raise_timeout(*args, **kwargs):
@@ -118,21 +134,25 @@ async def test_stream_response_timeout_error():
 
     service.client.chat.completions.create = raise_timeout
 
-    with pytest.raises(AIProviderException) as exc_info:
-        async for _ in service.stream_response([]):
-            pass
+    try:
+        with pytest.raises(AIProviderException) as exc_info:
+            async for _ in service.stream_response([]):
+                pass
 
-    assert exc_info.value.status_code == 504
-    assert str(exc_info.value) == "AI provider timed out."
+        assert exc_info.value.status_code == 504
+        assert str(exc_info.value) == "AI provider timed out."
+
+    finally:
+        await service.close()
 
 
 @pytest.mark.asyncio
 async def test_stream_response_connection_error():
     service = AIService()
 
-    http_request = httpx2.Request(
+    http_request = httpx.Request(
         "POST",
-        "https://api.groq.com/openai/v1/chat/completions"
+        "https://api.groq.com/openai/v1/chat/completions",
     )
 
     async def raise_conn_error(*args, **kwargs):
@@ -140,39 +160,51 @@ async def test_stream_response_connection_error():
 
     service.client.chat.completions.create = raise_conn_error
 
-    with pytest.raises(AIProviderException) as exc_info:
-        async for _ in service.stream_response([]):
-            pass
+    try:
+        with pytest.raises(AIProviderException) as exc_info:
+            async for _ in service.stream_response([]):
+                pass
 
-    assert exc_info.value.status_code == 503
-    assert str(exc_info.value) == "unable to connect to AI provider."
+        assert exc_info.value.status_code == 503
+        assert str(exc_info.value) == (
+            "unable to connect to AI provider."
+        )
+
+    finally:
+        await service.close()
 
 
 @pytest.mark.asyncio
 async def test_stream_response_status_error():
     service = AIService()
 
-    http_request = httpx2.Request(
+    http_request = httpx.Request(
         "POST",
-        "https://api.groq.com/openai/v1/chat/completions"
+        "https://api.groq.com/openai/v1/chat/completions",
     )
-    http_response = httpx2.Response(
+    http_response = httpx.Response(
         500,
-        request=http_request
+        request=http_request,
     )
 
     async def raise_status_error(*args, **kwargs):
         raise APIStatusError(
             "server error",
             response=http_response,
-            body=None
+            body=None,
         )
 
     service.client.chat.completions.create = raise_status_error
 
-    with pytest.raises(AIProviderException) as exc_info:
-        async for _ in service.stream_response([]):
-            pass
+    try:
+        with pytest.raises(AIProviderException) as exc_info:
+            async for _ in service.stream_response([]):
+                pass
 
-    assert exc_info.value.status_code == 502
-    assert str(exc_info.value) == "AI provider request failed."
+        assert exc_info.value.status_code == 502
+        assert str(exc_info.value) == (
+            "AI provider request failed."
+        )
+
+    finally:
+        await service.close()

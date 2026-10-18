@@ -8,22 +8,27 @@ from app.services.ai_service import AIService
 async def test_groq_real_streaming_response():
     service = AIService()
 
-    tokens = []
-    async for token in service.stream_response(
-        [
-            {
-                "role": "user",
-                "content": (
-                    "Reply with exactly: "
-                    "streaming integration test passed"
-                ),
-            }
-        ]
-    ):
-        tokens.append(token)
+    try:
+        chunks = []
 
-    full_response = "".join(tokens)
+        async for chunk in service.stream_response(
+            [
+                {
+                    "role": "user",
+                    "content": (
+                        "Reply with exactly: "
+                        "streaming integration test passed"
+                    ),
+                }
+            ]
+        ):
+            chunks.append(chunk)
 
-    assert full_response
-    assert isinstance(full_response, str)
-    assert "streaming integration test passed" in full_response.lower()
+        full_response = "".join(chunks)
+
+        assert full_response
+        assert isinstance(full_response, str)
+        assert "streaming integration test passed" in full_response.lower()
+
+    finally:
+        await service.close()

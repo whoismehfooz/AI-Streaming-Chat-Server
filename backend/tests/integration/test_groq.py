@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.ai_service import AIService
+from app.services.llm.ai_service import AIService
 
 
 @pytest.mark.integration

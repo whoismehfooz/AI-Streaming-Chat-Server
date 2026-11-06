@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 import os
 from app.db.base import Base
-from app.models import Conversation, Message
+from app.models import Conversation, Message, User
 from app.core.config import settings
 
 from alembic import context

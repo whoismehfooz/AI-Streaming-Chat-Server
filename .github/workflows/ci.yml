@@ -1,9 +1,9 @@
-
+'''
 name: Production CI Pipeline
 
 on:
   push:
-    branches:
+    branches
       - main
       - "feature/**"
 
@@ -133,3 +133,4 @@ jobs:
 
       - name: Run database integration tests
         run: python -m pytest -q tests/integration/test_chat_flow.py
+'''

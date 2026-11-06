@@ -1,46 +1,51 @@
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.exceptions.custom_exceptions import (
-    AIProviderException,
-    ConversationNotFoundException,
-    ContextBudgetExceededException
-)
+from app.exceptions.custom_exceptions import ApplicationException
 
 
-def register_exception_handlers(app:FastAPI):
-    @app.exception_handler(AIProviderException)
-    async def ai_provider_exception_handler(
-        request: Request,
-        exc: AIProviderException
-    ):
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={
-                "detail":str(exc)
-            }
-        )
+logger = logging.getLogger(__name__)
 
-    @app.exception_handler(ConversationNotFoundException)
-    async def conversation_not_found_exc_handler(
-        request: Request,
-        exc: ConversationNotFoundException
-    ):
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={
-                "detail":str(exc)
-            }
-        )
 
-    @app.exception_handler(ContextBudgetExceededException)
-    async def context_budget_exc_hanlder(
-        request: Request,
-        exc: ContextBudgetExceededException
-    ):
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={
-                "detail":str(exc)
-            }
-        )
+async def application_exception_handler(
+    request: Request,
+    exc: ApplicationException,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": str(exc),
+        },
+    )
+
+
+async def unhandled_exception_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    logger.exception(
+        "Unhandled application error during %s %s",
+        request.method,
+        request.url.path,
+    )
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error.",
+        },
+    )
+
+
+def register_exception_handlers(app: FastAPI) -> None:
+    app.add_exception_handler(
+        ApplicationException,
+        application_exception_handler,
+    )
+
+    app.add_exception_handler(
+        Exception,
+        unhandled_exception_handler,
+    )

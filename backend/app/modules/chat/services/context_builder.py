@@ -1,6 +1,6 @@
 from app.exceptions.custom_exceptions import ContextBudgetExceededException
 from app.models import Message
-from app.services.token_counter import TokenCounter
+from app.services.llm.token_counter import TokenCounter
 
 
 class ContextBuilder:

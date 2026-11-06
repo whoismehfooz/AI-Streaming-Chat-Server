@@ -5,11 +5,10 @@ from collections.abc import AsyncGenerator
 from uuid import UUID
 
 from app.exceptions.custom_exceptions import (
-    AIProviderException,
     ConversationNotFoundException,
 )
-from app.services.ai_service import AIService
-from app.services.context_builder import ContextBuilder
+from app.services.llm.ai_service import AIService
+from app.services.llm.context_builder import ContextBuilder
 from app.services.conversation_service import ConversationService
 from app.services.message_service import MessageService
 

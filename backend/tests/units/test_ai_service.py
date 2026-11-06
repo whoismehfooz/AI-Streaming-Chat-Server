@@ -13,7 +13,7 @@ from openai import (
 )
 
 from app.exceptions.custom_exceptions import AIProviderException
-from app.services import ai_service
+from app.services.llm import ai_service
 from app.services import AIService
 
 

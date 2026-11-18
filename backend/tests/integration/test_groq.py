@@ -14,7 +14,7 @@ async def test_groq_real_streaming_response():
         async for chunk in service.stream_response(
             [
                 {
-                    "role": "user",
+                    "role": "users",
                     "content": (
                         "Reply with exactly: "
                         "streaming integration test passed"

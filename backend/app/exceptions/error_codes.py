@@ -1,0 +1,335 @@
+"""
+Centralized application error codes.
+
+Error codes are stable, machine-readable identifiers used by API clients
+to identify application failures independently of their human-readable
+error messages.
+
+Conventions:
+    - Codes are uppercase.
+    - Codes are grouped by application domain.
+    - Codes must remain stable once exposed through the public API.
+    - Human-readable messages must never be used as error identifiers.
+    - Sensitive internal implementation details must never be encoded
+      into error codes.
+"""
+
+from enum import Enum
+
+
+class ErrorCode(str, Enum):
+    """
+    Canonical error codes for the AI Streaming Chat Server.
+
+    Error codes are grouped by domain to make the application's error
+    contract predictable and easy to extend.
+
+    Do not rename or reuse an existing code after it has been exposed
+    to API consumers.
+    """
+
+    # ================================================================
+    # GENERAL APPLICATION ERRORS
+    # ================================================================
+
+    INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR"
+
+    APPLICATION_ERROR = "APPLICATION_ERROR"
+
+    REQUEST_VALIDATION_ERROR = "REQUEST_VALIDATION_ERROR"
+
+    HTTP_ERROR = "HTTP_ERROR"
+
+    RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND"
+
+    RESOURCE_CONFLICT = "RESOURCE_CONFLICT"
+
+    OPERATION_NOT_ALLOWED = "OPERATION_NOT_ALLOWED"
+
+    RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED"
+
+    SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE"
+
+    REQUEST_TIMEOUT = "REQUEST_TIMEOUT"
+
+    # ================================================================
+    # USER AND ACCOUNT ERRORS
+    # ================================================================
+
+    USER_NOT_FOUND = "USER_NOT_FOUND"
+
+    EMAIL_ALREADY_REGISTERED = "EMAIL_ALREADY_REGISTERED"
+
+    USERNAME_ALREADY_REGISTERED = "USERNAME_ALREADY_REGISTERED"
+
+    ACCOUNT_ALREADY_EXISTS = "ACCOUNT_ALREADY_EXISTS"
+
+    ACCOUNT_INACTIVE = "ACCOUNT_INACTIVE"
+
+    ACCOUNT_SUSPENDED = "ACCOUNT_SUSPENDED"
+
+    ACCOUNT_DEACTIVATED = "ACCOUNT_DEACTIVATED"
+
+    ACCOUNT_DELETED = "ACCOUNT_DELETED"
+
+    ACCOUNT_LOCKED = "ACCOUNT_LOCKED"
+
+    ACCOUNT_NOT_VERIFIED = "ACCOUNT_NOT_VERIFIED"
+
+    ACCOUNT_STATE_INVALID = "ACCOUNT_STATE_INVALID"
+
+    # ================================================================
+    # AUTHENTICATION ERRORS
+    # ================================================================
+
+    AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED"
+
+    AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED"
+
+    INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
+
+    INVALID_PASSWORD = "INVALID_PASSWORD"
+
+    PASSWORD_MISMATCH = "PASSWORD_MISMATCH"
+
+    PASSWORD_POLICY_VIOLATION = "PASSWORD_POLICY_VIOLATION"
+
+    PASSWORD_RESET_REQUIRED = "PASSWORD_RESET_REQUIRED"
+
+    REAUTHENTICATION_REQUIRED = "REAUTHENTICATION_REQUIRED"
+
+    AUTHENTICATION_RATE_LIMIT_EXCEEDED = (
+        "AUTHENTICATION_RATE_LIMIT_EXCEEDED"
+    )
+
+    # ================================================================
+    # ACCESS TOKEN ERRORS
+    # ================================================================
+
+    INVALID_ACCESS_TOKEN = "INVALID_ACCESS_TOKEN"
+
+    EXPIRED_ACCESS_TOKEN = "EXPIRED_ACCESS_TOKEN"
+
+    REVOKED_ACCESS_TOKEN = "REVOKED_ACCESS_TOKEN"
+
+    MALFORMED_ACCESS_TOKEN = "MALFORMED_ACCESS_TOKEN"
+
+    UNSUPPORTED_TOKEN_TYPE = "UNSUPPORTED_TOKEN_TYPE"
+
+    INVALID_TOKEN_SIGNATURE = "INVALID_TOKEN_SIGNATURE"
+
+    INVALID_TOKEN_ISSUER = "INVALID_TOKEN_ISSUER"
+
+    INVALID_TOKEN_AUDIENCE = "INVALID_TOKEN_AUDIENCE"
+
+    INVALID_TOKEN_CLAIMS = "INVALID_TOKEN_CLAIMS"
+
+    MISSING_TOKEN_CLAIMS = "MISSING_TOKEN_CLAIMS"
+
+    INVALID_TOKEN_ALGORITHM = "INVALID_TOKEN_ALGORITHM"
+
+    # ================================================================
+    # REFRESH TOKEN AND SESSION ERRORS
+    # ================================================================
+
+    INVALID_REFRESH_TOKEN = "INVALID_REFRESH_TOKEN"
+
+    EXPIRED_REFRESH_TOKEN = "EXPIRED_REFRESH_TOKEN"
+
+    REVOKED_REFRESH_TOKEN = "REVOKED_REFRESH_TOKEN"
+
+    REFRESH_TOKEN_REUSE_DETECTED = "REFRESH_TOKEN_REUSE_DETECTED"
+
+    REFRESH_TOKEN_ROTATION_FAILED = "REFRESH_TOKEN_ROTATION_FAILED"
+
+    SESSION_NOT_FOUND = "SESSION_NOT_FOUND"
+
+    SESSION_EXPIRED = "SESSION_EXPIRED"
+
+    SESSION_REVOKED = "SESSION_REVOKED"
+
+    SESSION_INACTIVE = "SESSION_INACTIVE"
+
+    SESSION_LIMIT_EXCEEDED = "SESSION_LIMIT_EXCEEDED"
+
+    INVALID_SESSION = "INVALID_SESSION"
+
+    # ================================================================
+    # EMAIL VERIFICATION ERRORS
+    # ================================================================
+
+    EMAIL_NOT_VERIFIED = "EMAIL_NOT_VERIFIED"
+
+    EMAIL_ALREADY_VERIFIED = "EMAIL_ALREADY_VERIFIED"
+
+    INVALID_EMAIL_VERIFICATION_TOKEN = (
+        "INVALID_EMAIL_VERIFICATION_TOKEN"
+    )
+
+    EXPIRED_EMAIL_VERIFICATION_TOKEN = (
+        "EXPIRED_EMAIL_VERIFICATION_TOKEN"
+    )
+
+    USED_EMAIL_VERIFICATION_TOKEN = (
+        "USED_EMAIL_VERIFICATION_TOKEN"
+    )
+
+    EMAIL_VERIFICATION_REQUIRED = "EMAIL_VERIFICATION_REQUIRED"
+
+    EMAIL_VERIFICATION_FAILED = "EMAIL_VERIFICATION_FAILED"
+
+    # ================================================================
+    # PASSWORD RESET AND RECOVERY ERRORS
+    # ================================================================
+
+    INVALID_PASSWORD_RESET_TOKEN = "INVALID_PASSWORD_RESET_TOKEN"
+
+    EXPIRED_PASSWORD_RESET_TOKEN = "EXPIRED_PASSWORD_RESET_TOKEN"
+
+    USED_PASSWORD_RESET_TOKEN = "USED_PASSWORD_RESET_TOKEN"
+
+    PASSWORD_RESET_FAILED = "PASSWORD_RESET_FAILED"
+
+    PASSWORD_RESET_TOKEN_REQUIRED = "PASSWORD_RESET_TOKEN_REQUIRED"
+
+    PASSWORD_CHANGE_FAILED = "PASSWORD_CHANGE_FAILED"
+
+    # ================================================================
+    # AUTHORIZATION ERRORS
+    # ================================================================
+
+    AUTHORIZATION_FAILED = "AUTHORIZATION_FAILED"
+
+    ACCESS_DENIED = "ACCESS_DENIED"
+
+    PERMISSION_DENIED = "PERMISSION_DENIED"
+
+    INSUFFICIENT_PERMISSIONS = "INSUFFICIENT_PERMISSIONS"
+
+    REQUIRED_ROLE_MISSING = "REQUIRED_ROLE_MISSING"
+
+    ROLE_NOT_FOUND = "ROLE_NOT_FOUND"
+
+    PERMISSION_NOT_FOUND = "PERMISSION_NOT_FOUND"
+
+    INVALID_ROLE_ASSIGNMENT = "INVALID_ROLE_ASSIGNMENT"
+
+    INVALID_PERMISSION_ASSIGNMENT = "INVALID_PERMISSION_ASSIGNMENT"
+
+    PRIVILEGE_ESCALATION_DENIED = "PRIVILEGE_ESCALATION_DENIED"
+
+    # ================================================================
+    # RESOURCE OWNERSHIP AND OBJECT-LEVEL AUTHORIZATION
+    # ================================================================
+
+    RESOURCE_ACCESS_DENIED = "RESOURCE_ACCESS_DENIED"
+
+    RESOURCE_OWNERSHIP_VIOLATION = "RESOURCE_OWNERSHIP_VIOLATION"
+
+    RESOURCE_NOT_OWNED = "RESOURCE_NOT_OWNED"
+
+    CROSS_USER_ACCESS_DENIED = "CROSS_USER_ACCESS_DENIED"
+
+    BULK_RESOURCE_ACCESS_DENIED = "BULK_RESOURCE_ACCESS_DENIED"
+
+    FIELD_ACCESS_DENIED = "FIELD_ACCESS_DENIED"
+
+    ACTION_NOT_PERMITTED = "ACTION_NOT_PERMITTED"
+
+    # ================================================================
+    # CONVERSATION AND MESSAGE AUTHORIZATION
+    # ================================================================
+
+    CONVERSATION_NOT_FOUND = "CONVERSATION_NOT_FOUND"
+
+    CONVERSATION_ACCESS_DENIED = "CONVERSATION_ACCESS_DENIED"
+
+    CONVERSATION_OWNERSHIP_VIOLATION = (
+        "CONVERSATION_OWNERSHIP_VIOLATION"
+    )
+
+    CONVERSATION_OPERATION_DENIED = "CONVERSATION_OPERATION_DENIED"
+
+    MESSAGE_NOT_FOUND = "MESSAGE_NOT_FOUND"
+
+    MESSAGE_ACCESS_DENIED = "MESSAGE_ACCESS_DENIED"
+
+    MESSAGE_OWNERSHIP_VIOLATION = "MESSAGE_OWNERSHIP_VIOLATION"
+
+    MESSAGE_OPERATION_DENIED = "MESSAGE_OPERATION_DENIED"
+
+    CHAT_HISTORY_ACCESS_DENIED = "CHAT_HISTORY_ACCESS_DENIED"
+
+    CONVERSATION_CONTEXT_ACCESS_DENIED = (
+        "CONVERSATION_CONTEXT_ACCESS_DENIED"
+    )
+
+    # ================================================================
+    # STREAMING AUTHORIZATION
+    # ================================================================
+
+    STREAM_ACCESS_DENIED = "STREAM_ACCESS_DENIED"
+
+    STREAM_OWNERSHIP_VIOLATION = "STREAM_OWNERSHIP_VIOLATION"
+
+    STREAM_INITIALIZATION_DENIED = "STREAM_INITIALIZATION_DENIED"
+
+    STREAM_CANCELLATION_DENIED = "STREAM_CANCELLATION_DENIED"
+
+    STREAM_STATUS_ACCESS_DENIED = "STREAM_STATUS_ACCESS_DENIED"
+
+    STREAM_CONNECTION_DENIED = "STREAM_CONNECTION_DENIED"
+
+    STREAM_LIMIT_EXCEEDED = "STREAM_LIMIT_EXCEEDED"
+
+    STREAM_TIMEOUT = "STREAM_TIMEOUT"
+
+    # ================================================================
+    # AI APPLICATION AUTHORIZATION AND USAGE LIMITS
+    # ================================================================
+
+    AI_MODEL_ACCESS_DENIED = "AI_MODEL_ACCESS_DENIED"
+
+    AI_FEATURE_ACCESS_DENIED = "AI_FEATURE_ACCESS_DENIED"
+
+    AI_USAGE_QUOTA_EXCEEDED = "AI_USAGE_QUOTA_EXCEEDED"
+
+    AI_TOKEN_LIMIT_EXCEEDED = "AI_TOKEN_LIMIT_EXCEEDED"
+
+    AI_REQUEST_LIMIT_EXCEEDED = "AI_REQUEST_LIMIT_EXCEEDED"
+
+    AI_CONCURRENT_GENERATION_LIMIT_EXCEEDED = (
+        "AI_CONCURRENT_GENERATION_LIMIT_EXCEEDED"
+    )
+
+    AI_COST_LIMIT_EXCEEDED = "AI_COST_LIMIT_EXCEEDED"
+
+    # ================================================================
+    # EXISTING AI AND CHAT DOMAIN ERRORS
+    # ================================================================
+
+    AI_PROVIDER_ERROR = "AI_PROVIDER_ERROR"
+
+    AI_PROVIDER_TIMEOUT = "AI_PROVIDER_TIMEOUT"
+
+    AI_PROVIDER_UNAVAILABLE = "AI_PROVIDER_UNAVAILABLE"
+
+    AI_PROVIDER_RATE_LIMITED = "AI_PROVIDER_RATE_LIMITED"
+
+    CONTEXT_BUDGET_EXCEEDED = "CONTEXT_BUDGET_EXCEEDED"
+
+    # ================================================================
+    # DATABASE AND PERSISTENCE ERRORS
+    # ================================================================
+
+    DATABASE_ERROR = "DATABASE_ERROR"
+
+    DATABASE_CONNECTION_ERROR = "DATABASE_CONNECTION_ERROR"
+
+    DATABASE_TRANSACTION_ERROR = "DATABASE_TRANSACTION_ERROR"
+
+    DATABASE_CONSTRAINT_VIOLATION = "DATABASE_CONSTRAINT_VIOLATION"
+
+    DATABASE_INTEGRITY_ERROR = "DATABASE_INTEGRITY_ERROR"
+
+    PERSISTENCE_ERROR = "PERSISTENCE_ERROR"

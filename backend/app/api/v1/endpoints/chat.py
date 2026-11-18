@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import StreamingResponse
 
 from app.api.dependencies import get_chat_service
-from app.exceptions.custom_exceptions import (
+from app.exceptions.base import (
     AIProviderException,
     ConversationNotFoundException,
 )

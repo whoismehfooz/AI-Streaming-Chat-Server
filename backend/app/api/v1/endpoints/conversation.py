@@ -5,13 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from app.db.dependencies import get_db_session
-from app.schemas.conversation import (
+from app.modules.conversations.schemas.conversation import (
     ConversationCreate,
     ConversationResponse,
     ConversationListResponse
 )
-from app.services.conversation_service import ConversationService
-from app.exceptions.custom_exceptions import ConversationNotFoundException
+from app.modules.conversations.services.conversation_service import ConversationService
+from app.exceptions.resources import ConversationNotFoundException
 
 conversation_router = APIRouter(
     prefix="/conversations",

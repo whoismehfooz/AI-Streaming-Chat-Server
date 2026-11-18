@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -17,11 +19,12 @@ from app.db.base import Base
 
 
 if TYPE_CHECKING:
-    from app.models.message import Message
-    from app.models.user import User
+    from app.modules.conversations.models.message import Message
+    from app.modules.users.models.user import User
 
 
 class Conversation(Base):
+
     __tablename__ = "conversations"
 
     __table_args__ = (
@@ -72,6 +75,7 @@ class Conversation(Base):
 
     user: Mapped["User"] = relationship(
         back_populates="conversations",
+        lazy="raise"
     )
 
     messages: Mapped[list["Message"]] = relationship(
@@ -79,4 +83,5 @@ class Conversation(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
         order_by="(Message.created_at, Message.id)",
+        lazy="raise"
     )

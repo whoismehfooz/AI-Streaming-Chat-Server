@@ -7,7 +7,7 @@ from app.schemas.message import MessageCreate
 @pytest.mark.parametrize(
     "role",
     [
-        "user",
+        "users",
         "assistant",
         "system"
     ],
@@ -44,6 +44,6 @@ def test_message_create_rejects_invalid_roles(role):
 def test_message_create_rejects_empyt_content():
     with pytest.raises(ValidationError):
         MessageCreate(
-            role="user",
+            role="users",
             content=""
         )

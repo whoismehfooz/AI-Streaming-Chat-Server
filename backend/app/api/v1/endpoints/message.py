@@ -11,7 +11,7 @@ from app.schemas.message import (
 )
 
 from app.services import ConversationService, MessageService
-from app.exceptions.custom_exceptions import ConversationNotFoundException
+from app.exceptions.base import ConversationNotFoundException
 
 
 message_router = APIRouter(

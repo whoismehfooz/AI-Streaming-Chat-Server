@@ -181,7 +181,7 @@ async def test_create_message():
         response = await client.post(
             f"/conversations/{conversation_id}/messages",
             json={
-                "role":"user",
+                "role":"users",
                 "content":"Hello from API integration test."
             }
         )
@@ -192,7 +192,7 @@ async def test_create_message():
 
     assert data["id"] 
     assert data["conversation_id"] == conversation_id
-    assert data["role"] == "user"
+    assert data["role"] == "users"
     assert data["content"] == (
         "Hello from API integration test."
     )
@@ -221,7 +221,7 @@ async def test_list_messages():
         first_message = await client.post(
             f"/conversations/{conversation_id}/messages",
             json={
-                "role":"user",
+                "role":"users",
                 "content":"First message"
             }
         )
@@ -275,7 +275,7 @@ async def test_create_message_rejects_empty_content():
         response = await client.post(
             f"/conversations/{conversation_id}/messages",
             json={
-                "role":"user",
+                "role":"users",
                 "content":""
             }
         )
@@ -295,7 +295,7 @@ async def test_create_message_for_nonexistent_conversation():
         response = await client.post(
             f"/conversations/{uuid4()}/messages",
             json={
-                "role": "user",
+                "role": "users",
                 "content": "This should fail.",
             },
         )
@@ -419,7 +419,7 @@ async def test_chat_stream_endpoint_with_persisted_message():
 
             response = await client.post(
                 f"/conversations/{conversation_id}/chat/stream",
-                json={"content": "First user message"},
+                json={"content": "First users message"},
             )
 
             assert response.status_code == 200
@@ -441,8 +441,8 @@ async def test_chat_stream_endpoint_with_persisted_message():
 
             assert len(messages) == 2
 
-            assert messages[0]["role"] == "user"
-            assert messages[0]["content"] == "First user message"
+            assert messages[0]["role"] == "users"
+            assert messages[0]["content"] == "First users message"
 
             assert messages[1]["role"] == "assistant"
             assert messages[1]["content"] == "Fake response 1"
@@ -507,7 +507,7 @@ async def test_chat_stream_endpoint_preserves_multi_turn_context():
                     "content": "You are a helpful assistant.",
                 },
                 {
-                    "role": "user",
+                    "role": "users",
                     "content": "My name is Ray.",
                 },
             ]
@@ -518,7 +518,7 @@ async def test_chat_stream_endpoint_preserves_multi_turn_context():
                     "content": "You are a helpful assistant.",
                 },
                 {
-                    "role": "user",
+                    "role": "users",
                     "content": "My name is Ray.",
                 },
                 {
@@ -526,7 +526,7 @@ async def test_chat_stream_endpoint_preserves_multi_turn_context():
                     "content": "Fake response 1",
                 },
                 {
-                    "role": "user",
+                    "role": "users",
                     "content": "What is my name?",
                 },
             ]
@@ -584,7 +584,7 @@ async def test_chat_stream_persists_user_message_when_ai_provider_fails(
                 messages = list(result.scalars().all())
 
             assert len(messages) == 1
-            assert messages[0].role == "user"
+            assert messages[0].role == "users"
             assert messages[0].content == (
                 "This message should survive an AI failure."
             )

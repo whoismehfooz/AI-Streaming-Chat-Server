@@ -12,7 +12,7 @@ from openai import (
     RateLimitError,
 )
 
-from app.exceptions.custom_exceptions import AIProviderException
+from app.exceptions.base import AIProviderException
 from app.services.llm import ai_service
 from app.services import AIService
 

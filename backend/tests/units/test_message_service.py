@@ -5,8 +5,8 @@ import uuid
 
 from app.models import Conversation, Message
 from app.services import MessageService
-from app.exceptions.custom_exceptions import ConversationNotFoundException
-from app.exceptions.custom_exceptions import ConversationNotFoundException
+from app.exceptions.base import ConversationNotFoundException
+from app.exceptions.base import ConversationNotFoundException
 
 
 @pytest.mark.asyncio
@@ -33,7 +33,7 @@ async def test_create_message_updates_conversation_updated_at(
 
         message = await service.create_message(
             conversation_id=conversation.id,
-            role="user",
+            role="users",
             content="First message."
         )
 
@@ -61,7 +61,7 @@ async def test_create_message_persists_conversation_timestamp_and_message(
 
         message = await service.create_message(
             conversation_id=conversation.id,
-            role="user",
+            role="users",
             content="Transactional message."
         )
 
@@ -100,7 +100,7 @@ async def test_create_message_rejects_missing_conversation(
         with pytest.raises(ConversationNotFoundException) as exc_info:
             await service.create_message(
                 conversation_id=uuid.uuid4(),
-                role="user",
+                role="users",
                 content="This should fail."
             )
 

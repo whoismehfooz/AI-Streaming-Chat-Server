@@ -1,4 +1,4 @@
-"""add user model and update existing models
+"""add users model and update existing models
 
 Revision ID: 86a0a0eda5b4
 Revises: 0d86b4fdcec9

@@ -13,7 +13,7 @@ from openai import (
 )
 
 from app.core.config import settings
-from app.exceptions.custom_exceptions import AIProviderException
+from app.exceptions.base import AIProviderException
 
 
 logger = logging.getLogger(__name__)

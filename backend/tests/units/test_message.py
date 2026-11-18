@@ -40,7 +40,7 @@ async def test_create_message_rejects_invalid_role():
 @pytest.mark.parametrize(
     "role",
     [
-        "user",
+        "users",
         "assistant",
         "system",
     ],
@@ -103,7 +103,7 @@ async def test_create_message_rejects_empty_content():
         response = await client.post(
             f"/conversations/{conversation_id}/messages",
             json={
-                "role": "user",
+                "role": "users",
                 "content": "",
             },
         )

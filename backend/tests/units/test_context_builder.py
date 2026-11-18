@@ -1,6 +1,6 @@
 import pytest
 
-from app.exceptions.custom_exceptions import ContextBudgetExceededException
+from app.exceptions.base import ContextBudgetExceededException
 from app.models import Message
 from app.services import ContextBuilder
 
@@ -31,9 +31,9 @@ async def test_context_builder_normal_context():
     )
 
     messages = [
-        Message(role="user", content="Hello"),
+        Message(role="users", content="Hello"),
         Message(role="assistant", content="Hi there!"),
-        Message(role="user", content="How are you?")
+        Message(role="users", content="How are you?")
     ]
 
     context = builder.build(messages)
@@ -44,7 +44,7 @@ async def test_context_builder_normal_context():
             "content": "You are a helpful assistant."
         },
         {
-            "role": "user",
+            "role": "users",
             "content": "Hello"
         },
         {
@@ -52,7 +52,7 @@ async def test_context_builder_normal_context():
             "content": "Hi there!"
         },
         {
-            "role": "user",
+            "role": "users",
             "content": "How are you?"
         }
     ]
@@ -76,9 +76,9 @@ async def test_context_builder_system_message_is_always_first():
     )
 
     messages = [
-        Message(role="user", content="message 1"),
+        Message(role="users", content="message 1"),
         Message(role="assistant", content="message 2"),
-        Message(role="user", content="message 3")
+        Message(role="users", content="message 3")
     ]
 
     context = builder.build(messages)
@@ -90,7 +90,7 @@ async def test_context_builder_system_message_is_always_first():
 
     assert context[1:] == [
         {
-            "role": "assistant" if False else "user",
+            "role": "assistant" if False else "users",
             "content": "message 1"
         },
         {
@@ -98,7 +98,7 @@ async def test_context_builder_system_message_is_always_first():
             "content": "message 2",
         },
         {
-            "role": "user",
+            "role": "users",
             "content": "message 3"
         }
     ]
@@ -123,9 +123,9 @@ async def test_context_builder_truncates_old_messages():
     )
 
     messages = [
-        Message(role="user", content="message 1"),
+        Message(role="users", content="message 1"),
         Message(role="assistant", content="message 2"),
-        Message(role="user", content="message 3"),
+        Message(role="users", content="message 3"),
         Message(role="assistant", content="message 4")
     ]
 
@@ -133,7 +133,7 @@ async def test_context_builder_truncates_old_messages():
 
     assert context == [
         {
-            "role": "user",
+            "role": "users",
             "content": "message 3"
         },
         {
@@ -160,9 +160,9 @@ async def test_context_builder_preserves_choronological_order():
     )
 
     messages = [
-        Message(role="user", content="message 1"),
+        Message(role="users", content="message 1"),
         Message(role="assistant", content="message 2"),
-        Message(role="user", content="message 3"),
+        Message(role="users", content="message 3"),
         Message(role="assistant", content="message 4")
     ]
 
@@ -174,7 +174,7 @@ async def test_context_builder_preserves_choronological_order():
     ]
 
     assert [message["role"] for message in context ] == [
-        "user",
+        "users",
         "assistant"
     ]
 

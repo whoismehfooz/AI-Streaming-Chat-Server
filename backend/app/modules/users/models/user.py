@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -20,10 +22,11 @@ from app.db.base import Base
 
 
 if TYPE_CHECKING:
-    from app.models.conversation import Conversation
+    from app.modules.conversations.models.conversation import Conversation
 
 
 class User(Base):
+
     __tablename__ = "users"
 
     __table_args__ = (

@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.exceptions.custom_exceptions import (
+from app.exceptions.base import (
     AIProviderException,
     ConversationNotFoundException,
 )
@@ -64,7 +64,7 @@ class FakeMessageService:
             }
         )
 
-        if role == "user":
+        if role == "users":
             return self.user_message
 
         return self.assistant_message
@@ -151,7 +151,7 @@ def build_chat_service(
     user_message = Message(
         id=uuid4(),
         conversation_id=conversation_id,
-        role="user",
+        role="users",
         content="Hello",
     )
 
@@ -215,7 +215,7 @@ async def test_stream_message_happy_path():
     user_message = Message(
         id=uuid4(),
         conversation_id=conversation_id,
-        role="user",
+        role="users",
         content="Hello",
     )
 
@@ -250,12 +250,12 @@ async def test_stream_message_happy_path():
 
     assert "".join(chunks) == "Fake assistant response"
 
-    # The user message is persisted before the response is generated.
+    # The users message is persisted before the response is generated.
     assert len(message_service.created_messages) == 2
 
     assert message_service.created_messages[0] == {
         "conversation_id": conversation_id,
-        "role": "user",
+        "role": "users",
         "content": "Hello",
     }
 
@@ -269,7 +269,7 @@ async def test_stream_message_happy_path():
 
     assert ai_service.received_context == [
         {
-            "role": "user",
+            "role": "users",
             "content": "Hello",
         }
     ]
@@ -322,7 +322,7 @@ async def test_stream_message_uses_context_builder_output():
             "content": "Follow the test instructions.",
         },
         {
-            "role": "user",
+            "role": "users",
             "content": "A custom context message.",
         },
     ]
@@ -423,7 +423,7 @@ async def test_stream_message_does_not_persist_empty_assistant_response():
     assert [
         message["role"]
         for message in message_service.created_messages
-    ] == ["user"]
+    ] == ["users"]
 
 
 @pytest.mark.asyncio
@@ -468,7 +468,7 @@ async def test_stream_message_persists_partial_response_on_provider_failure():
     assert [
         message["role"]
         for message in message_service.created_messages
-    ] == ["user", "assistant"]
+    ] == ["users", "assistant"]
 
     assert message_service.created_messages[1]["content"] == (
         "Partial response\n\n[Stream Interrupted]"
@@ -511,7 +511,7 @@ async def test_stream_message_persists_partial_response_on_cancellation():
     assert [
         message["role"]
         for message in message_service.created_messages
-    ] == ["user", "assistant"]
+    ] == ["users", "assistant"]
 
     assert message_service.created_messages[1]["content"] == (
         "Partial response\n\n[Stream Cancelled]"
@@ -552,7 +552,7 @@ async def test_stream_message_persists_user_message_if_context_building_fails():
     assert [
         message["role"]
         for message in message_service.created_messages
-    ] == ["user"]
+    ] == ["users"]
 
     assert ai_service.call_count == 0
 
@@ -595,8 +595,8 @@ async def test_stream_message_propagates_assistant_persistence_failure():
 
     assert "".join(received_chunks) == "Fake assistant response"
 
-    # The user message succeeded, but the assistant message did not.
+    # The users message succeeded, but the assistant message did not.
     assert [
         message["role"]
         for message in message_service.created_messages
-    ] == ["user"]
+    ] == ["users"]

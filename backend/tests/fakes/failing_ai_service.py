@@ -1,4 +1,4 @@
-from app.exceptions.custom_exceptions import AIProviderException
+from app.exceptions.base import AIProviderException
 
 
 class FailingAIService:

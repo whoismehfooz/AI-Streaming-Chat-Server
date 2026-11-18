@@ -87,7 +87,7 @@ async def test_message_service():
 
         message = await message_service.create_message(
             conversation_id=conversation.id,
-            role="user",
+            role="users",
             content="Hello from the service."
         )
 

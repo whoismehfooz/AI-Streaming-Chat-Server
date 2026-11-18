@@ -107,7 +107,7 @@ async def test_full_chat_streaming_flow_with_real_database():
 
             assert len(messages) == 2
 
-            assert messages[0]["role"] == "user"
+            assert messages[0]["role"] == "users"
             assert messages[0]["content"] == user_content
 
             assert messages[1]["role"] == "assistant"

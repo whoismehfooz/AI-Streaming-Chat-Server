@@ -35,7 +35,7 @@ async def test_conversation_and_message_presistence():
 
         message = await message_repository.create(
             conversation_id=conversation.id,
-            role="user",
+            role="users",
             content="Hello from the repository test."
         )
 

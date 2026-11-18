@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from uuid import UUID
 
@@ -13,6 +15,7 @@ from pydantic import (
 
 
 class UserCreate(BaseModel):
+
     model_config = ConfigDict(extra="forbid")
 
     email: EmailStr
@@ -26,7 +29,6 @@ class UserCreate(BaseModel):
     def normalize_email(cls, value: object) -> object:
         if isinstance(value, str):
             return value.strip().lower()
-
         return value
 
     @field_validator("password")
@@ -34,11 +36,11 @@ class UserCreate(BaseModel):
     def validate_password(cls, value: SecretStr) -> SecretStr:
         if not value.get_secret_value().strip():
             raise ValueError("Password cannot be empty or whitespace.")
-
         return value
 
 
 class UserUpdate(BaseModel):
+
     model_config = ConfigDict(extra="forbid")
 
     email: EmailStr | None = None
@@ -48,7 +50,6 @@ class UserUpdate(BaseModel):
     def normalize_email(cls, value: object) -> object:
         if isinstance(value, str):
             return value.strip().lower()
-
         return value
 
     @model_validator(mode="after")
@@ -63,6 +64,7 @@ class UserUpdate(BaseModel):
 
 
 class UserResponse(BaseModel):
+
     model_config = ConfigDict(
         from_attributes=True,
         extra="forbid",
@@ -77,6 +79,7 @@ class UserResponse(BaseModel):
 
 
 class UserListResponse(BaseModel):
+
     model_config = ConfigDict(extra="forbid")
 
     items: list[UserResponse]
